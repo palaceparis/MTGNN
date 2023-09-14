@@ -8,6 +8,21 @@ from net import gtnet
 import pandas as pd
 
 
+def rmspe(y_true, y_pred):
+    """
+    Calculate Root Mean Squared Percentage Error
+    """
+    # Move tensors to CPU and convert them to numpy arrays
+    y_true = y_true.cpu().numpy()
+    y_pred = y_pred.cpu().numpy()
+
+    # Avoid division by zero and convert zeros to nan
+    y_true = np.where(y_true == 0, np.nan, y_true)
+
+    rmspe = np.sqrt(np.nanmean(np.square((y_true - y_pred) / y_true)))
+    return rmspe
+
+
 def str_to_bool(value):
     if isinstance(value, bool):
         return value
@@ -70,10 +85,8 @@ parser.add_argument("--end_channels", type=int, default=128, help="end channels"
 
 
 parser.add_argument("--in_dim", type=int, default=1, help="inputs dimension")
-parser.add_argument("--seq_in_len", type=int, default=12, help="input sequence length")
-parser.add_argument(
-    "--seq_out_len", type=int, default=12, help="output sequence length"
-)
+parser.add_argument("--seq_in_len", type=int, default=7, help="input sequence length")
+parser.add_argument("--seq_out_len", type=int, default=1, help="output sequence length")
 
 parser.add_argument("--layers", type=int, default=3, help="number of layers")
 parser.add_argument("--batch_size", type=int, default=64, help="batch size")
@@ -289,7 +302,7 @@ def main(runid):
         with torch.no_grad():
             preds = engine.model(testx)
             preds = preds.transpose(1, 3)
-        outputs.append(preds.squeeze())
+        outputs.append(preds.squeeze(dim=1))
 
     yhat = torch.cat(outputs, dim=0)
     yhat = yhat[: realy.size(0), ...]
@@ -308,7 +321,7 @@ def main(runid):
         with torch.no_grad():
             preds = engine.model(testx)
             preds = preds.transpose(1, 3)
-        outputs.append(preds.squeeze())
+        outputs.append(preds.squeeze(dim=1))
 
     yhat = torch.cat(outputs, dim=0)
     yhat = yhat[: realy.size(0), ...]
@@ -316,16 +329,22 @@ def main(runid):
     mae = []
     mape = []
     rmse = []
+    rmspe_list = []
     for i in range(args.seq_out_len):
         pred = scaler.inverse_transform(yhat[:, :, i])
         real = realy[:, :, i]
         metrics = metric(pred, real)
-        log = "Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}"
-        print(log.format(i + 1, metrics[0], metrics[1], metrics[2]))
+        rmspe_value = rmspe(real, pred)  # Calculate RMSPE
+
+        log = "Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}, Test RMSPE: {:.4f}"
+        print(log.format(i + 1, metrics[0], metrics[1], metrics[2], rmspe_value))
+
         mae.append(metrics[0])
         mape.append(metrics[1])
         rmse.append(metrics[2])
-    return vmae, vmape, vrmse, mae, mape, rmse
+        rmspe_list.append(rmspe_value)  # Store RMSPE values in a list
+        rmspe_array = np.array(rmspe_list)
+    return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array
 
 
 if __name__ == "__main__":
@@ -335,14 +354,16 @@ if __name__ == "__main__":
     mae = []
     mape = []
     rmse = []
+    rmspe4 = []
     for i in range(args.runs):
-        vm1, vm2, vm3, m1, m2, m3 = main(i)
+        vm1, vm2, vm3, m1, m2, m3, m4 = main(i)
         vmae.append(vm1)
         vmape.append(vm2)
         vrmse.append(vm3)
         mae.append(m1)
         mape.append(m2)
         rmse.append(m3)
+        rmspe4.append(m4)
 
     mae = np.array(mae)
     mape = np.array(mape)
@@ -351,6 +372,7 @@ if __name__ == "__main__":
     amae = np.mean(mae, 0)
     amape = np.mean(mape, 0)
     armse = np.mean(rmse, 0)
+    armspe = np.mean(rmspe4, 0)
 
     smae = np.std(mae, 0)
     smape = np.std(mape, 0)
@@ -365,9 +387,21 @@ if __name__ == "__main__":
     print(log.format(np.std(vmae), np.std(vrmse), np.std(vmape)))
     print("\n\n")
     # test data
-    print("test|horizon\tMAE-mean\tRMSE-mean\tMAPE-mean\tMAE-std\tRMSE-std\tMAPE-std")
-    for i in [2, 5, 11]:
-        log = "{:d}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}"
+    print(
+        "test|horizon\tMAE-mean\tRMSE-mean\tRMSPE-mean\tMAPE-mean\tMAE-std\tRMSE-std\tMAPE-std"
+    )
+    # 2 for 3 days ahead, 0 for 1 day ahead
+    for i in [0]:
+        log = "{:d}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}"
         print(
-            log.format(i + 1, amae[i], armse[i], amape[i], smae[i], srmse[i], smape[i])
+            log.format(
+                i + 1,
+                amae[i],
+                armse[i],
+                amape[i],
+                smae[i],
+                srmse[i],
+                smape[i],
+                armspe[i],
+            )
         )

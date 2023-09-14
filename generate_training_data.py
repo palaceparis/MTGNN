@@ -65,13 +65,12 @@ def generate_train_val_test(args):
     emissions = emissions.set_index("Date")
     df = emissions.values
 
-    # 0 is the latest observed sample.
-    x_offsets = np.sort(
-        # np.concatenate(([-week_size + 1, -day_size + 1], np.arange(-11, 1, 1)))
-        np.concatenate((np.arange(-11, 1, 1),))
-    )
-    # Predict the next one hour
-    y_offsets = np.sort(np.arange(1, 13, 1))
+    # Look back for 7 days, so we take the range from -7 to 0 (inclusive)
+    x_offsets = np.sort(np.arange(-6, 1, 1))
+
+    # Look ahead for 1 day, so we take a single value, 1
+    y_offsets = np.sort(np.arange(1, 2, 1))
+
     # x: (num_samples, input_length, num_nodes, input_dim)
     # y: (num_samples, output_length, num_nodes, output_dim)
     x, y = generate_graph_seq2seq_io_data(
@@ -121,7 +120,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--output_dir", type=str, default="data/", help="Output directory."
+        "--output_dir", type=str, default="data/METR-LA", help="Output directory."
     )
     parser.add_argument(
         "--traffic_df_filename",
