@@ -5,6 +5,7 @@ import time
 from util import *
 from trainer import Trainer
 from net import gtnet
+import pandas as pd
 
 
 def str_to_bool(value):
@@ -49,7 +50,7 @@ parser.add_argument(
 
 parser.add_argument("--gcn_depth", type=int, default=2, help="graph convolution depth")
 parser.add_argument(
-    "--num_nodes", type=int, default=207, help="number of nodes/variables"
+    "--num_nodes", type=int, default=31, help="number of nodes/variables"
 )
 parser.add_argument("--dropout", type=float, default=0.3, help="dropout rate")
 parser.add_argument("--subgraph_size", type=int, default=20, help="k")
@@ -68,7 +69,7 @@ parser.add_argument("--skip_channels", type=int, default=64, help="skip channels
 parser.add_argument("--end_channels", type=int, default=128, help="end channels")
 
 
-parser.add_argument("--in_dim", type=int, default=2, help="inputs dimension")
+parser.add_argument("--in_dim", type=int, default=1, help="inputs dimension")
 parser.add_argument("--seq_in_len", type=int, default=12, help="input sequence length")
 parser.add_argument(
     "--seq_out_len", type=int, default=12, help="output sequence length"
@@ -117,8 +118,18 @@ def main(runid):
     )
     scaler = dataloader["scaler"]
 
-    predefined_A = load_adj(args.adj_data)
-    predefined_A = torch.tensor(predefined_A) - torch.eye(args.num_nodes)
+    predefined_A = pd.read_csv("data/sensor_graph/distance.csv", header=None)
+
+    # Assuming 'matrix' is your 2D NumPy array
+    mean = np.mean(predefined_A)
+    std = np.std(predefined_A)
+
+    # Z-score normalization
+    predefined_A = (predefined_A - mean) / std
+    predefined_A = np.array([predefined_A])
+    predefined_A = torch.tensor(predefined_A)
+
+    # predefined_A = torch.tensor(predefined_A) - torch.eye(args.num_nodes)
     predefined_A = predefined_A.to(device)
 
     # if args.load_static_feature:
