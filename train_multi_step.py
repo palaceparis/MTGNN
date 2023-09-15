@@ -187,10 +187,10 @@ def main(runid):
     # )
     args = parser.parse_args()
 
-    # torch.manual_seed(args.seed)
-    # torch.backends.cudnn.deterministic = True
-    # torch.backends.cudnn.benchmark = False
-    # np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(args.seed)
     # load data
     device = torch.device(args.device)
     dataloader = load_dataset(
@@ -510,9 +510,7 @@ if __name__ == "__main__":
     print("\n\n")
 
     # test data
-    print(
-        "test|horizon\tMAE-mean\tMAPE-mean\tRMSE-mean\tRMSPE-mean\tR2-mean\tMAE-std\tMAPE-std\tRMSE-std\tRMSPE-std\tR2-std"
-    )
+    print("test|horizon\tMAE-mean\tMAPE-mean\tRMSE-mean\tRMSPE-mean\tR2-mean")
     # Determine the number of horizons from the shape of one of your metric arrays
     # num_horizons = amae.shape[0]
 
@@ -523,14 +521,14 @@ if __name__ == "__main__":
     overall_armspe = np.mean(armspe) * 100  # Convert to percentage
     overall_arsquared = np.mean(arsquared)
 
-    overall_smae = np.std(amae)
-    overall_smape = np.std(amape)  # Standard deviation without percentage
-    overall_srmse = np.std(rmse)
-    overall_srmspe = np.std(armspe)  # Standard deviation without percentage
-    overall_sr_squared = np.std(r_squared)
+    # overall_smae = np.std(amae)
+    # overall_smape = np.std(amape)  # Standard deviation without percentage
+    # overall_srmse = np.std(rmse)
+    # overall_srmspe = np.std(armspe)  # Standard deviation without percentage
+    # overall_sr_squared = np.std(r_squared)
 
     # Print the overall averages and standard deviations
-    log = "Overall\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}"
+    log = "Overall\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}%\t{:.3f}"
     print(
         log.format(
             overall_amae,
@@ -538,11 +536,11 @@ if __name__ == "__main__":
             overall_armse,
             overall_armspe,
             overall_arsquared,
-            overall_smae,
-            overall_smape,
-            overall_srmse,
-            overall_srmspe,
-            overall_sr_squared,
+            # overall_smae,
+            # overall_smape,
+            # overall_srmse,
+            # overall_srmspe,
+            # overall_sr_squared,
         )
     )
 
