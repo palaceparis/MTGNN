@@ -113,7 +113,7 @@ parser.add_argument(
     "--num_split", type=int, default=1, help="number of splits for graphs"
 )
 
-parser.add_argument("--runs", type=int, default=5, help="number of runs")
+parser.add_argument("--runs", type=int, default=1, help="number of runs")
 
 
 args = parser.parse_args()
@@ -352,7 +352,7 @@ def main(runid):
         rmspe_list.append(rmspe_value)  # Store RMSPE values in a list
         rmspe_array = np.array(rmspe_list)
         r2_list.append(r2_value)  # Store R-squared values in a list
-        r2_array = np.array(rmspe_list)
+        r2_array = np.array(r2_list)
     return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array
 
 
