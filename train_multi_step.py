@@ -90,7 +90,7 @@ parser.add_argument("--end_channels", type=int, default=213, help="end channels"
 
 parser.add_argument("--in_dim", type=int, default=1, help="inputs dimension")
 parser.add_argument("--seq_in_len", type=int, default=7, help="input sequence length")
-parser.add_argument("--seq_out_len", type=int, default=3, help="output sequence length")
+parser.add_argument("--seq_out_len", type=int, default=1, help="output sequence length")
 
 parser.add_argument("--layers", type=int, default=9, help="number of layers")
 parser.add_argument("--batch_size", type=int, default=32, help="batch size")
@@ -128,63 +128,63 @@ args = parser.parse_args()
 torch.set_num_threads(3)
 
 
-# space = {
-#     "learning_rate": hp.loguniform(
-#         "learning_rate", -5, 0
-#     ),  # Log-uniform distribution between e^-5 and 1
-#     "dropout": hp.uniform(
-#         "dropout", 0.1, 0.5
-#     ),  # Uniform distribution between 0.1 and 0.5
-#     "batch_size": hp.choice(
-#         "batch_size", [16, 32, 64]
-#     ),  # Choice among the specified values
-#     "gcn_depth": hp.choice(
-#         "gcn_depth", [1, 2, 3, 4, 5]
-#     ),  # Choice among the specified values
-#     "layers": hp.quniform(
-#         "layers", 1, 10, 1
-#     ),  # Uniform distribution of integer values between 1 and 10
-#     "weight_decay": hp.loguniform(
-#         "weight_decay", -10, -4
-#     ),  # Log-uniform distribution between e^-10 and e^-4
-#     "subgraph_size": hp.quniform(
-#         "subgraph_size", 10, 30, 1
-#     ),  # Uniform distribution of integer values between 10 and 30
-#     "node_dim": hp.quniform(
-#         "node_dim", 20, 60, 1
-#     ),  # Uniform distribution of integer values between 20 and 60
-#     "conv_channels": hp.quniform(
-#         "conv_channels", 16, 64, 1
-#     ),  # Uniform distribution of integer values between 16 and 64
-#     "residual_channels": hp.quniform(
-#         "residual_channels", 16, 64, 1
-#     ),  # Uniform distribution of integer values between 16 and 64
-#     "skip_channels": hp.quniform(
-#         "skip_channels", 32, 128, 1
-#     ),  # Uniform distribution of integer values between 32 and 128
-#     "end_channels": hp.quniform(
-#         "end_channels", 64, 256, 1
-#     ),  # Uniform distribution of integer values between 64 and 256
-# }
+space = {
+    "learning_rate": hp.loguniform(
+        "learning_rate", -5, 0
+    ),  # Log-uniform distribution between e^-5 and 1
+    "dropout": hp.uniform(
+        "dropout", 0.1, 0.5
+    ),  # Uniform distribution between 0.1 and 0.5
+    "batch_size": hp.choice(
+        "batch_size", [16, 32, 64]
+    ),  # Choice among the specified values
+    "gcn_depth": hp.choice(
+        "gcn_depth", [1, 2, 3, 4, 5]
+    ),  # Choice among the specified values
+    "layers": hp.quniform(
+        "layers", 1, 10, 1
+    ),  # Uniform distribution of integer values between 1 and 10
+    "weight_decay": hp.loguniform(
+        "weight_decay", -10, -4
+    ),  # Log-uniform distribution between e^-10 and e^-4
+    "subgraph_size": hp.quniform(
+        "subgraph_size", 10, 30, 1
+    ),  # Uniform distribution of integer values between 10 and 30
+    "node_dim": hp.quniform(
+        "node_dim", 20, 60, 1
+    ),  # Uniform distribution of integer values between 20 and 60
+    "conv_channels": hp.quniform(
+        "conv_channels", 16, 64, 1
+    ),  # Uniform distribution of integer values between 16 and 64
+    "residual_channels": hp.quniform(
+        "residual_channels", 16, 64, 1
+    ),  # Uniform distribution of integer values between 16 and 64
+    "skip_channels": hp.quniform(
+        "skip_channels", 32, 128, 1
+    ),  # Uniform distribution of integer values between 32 and 128
+    "end_channels": hp.quniform(
+        "end_channels", 64, 256, 1
+    ),  # Uniform distribution of integer values between 64 and 256
+}
 
 
-def main(runid):
-    # parser.set_defaults(
-    #     learning_rate=hyperparams["learning_rate"],
-    #     dropout=hyperparams["dropout"],
-    #     batch_size=int(hyperparams["batch_size"]),  # Ensure this is an integer
-    #     gcn_depth=int(hyperparams["gcn_depth"]),  # Ensure this is an integer
-    #     layers=int(hyperparams["layers"]),  # Ensure this is an integer
-    #     weight_decay=hyperparams["weight_decay"],
-    #     subgraph_size=int(hyperparams["subgraph_size"]),  # Ensure this is an integer
-    #     node_dim=int(hyperparams["node_dim"]),  # Ensure this is an integer
-    #     conv_channels=int(hyperparams["conv_channels"]),  # Ensure this is an integer
-    #     residual_channels=int(
-    #         hyperparams["residual_channels"]
-    #     ),  # Ensure this is an integer
-    #     skip_channels=int(hyperparams["skip_channels"]),  # Ensure this is an integer
-    #     end_channels=int(hyperparams["end_channels"]),  # Ensure this is an integer
-    # )
+def main(runid, hyperparams):
+    parser.set_defaults(
+        learning_rate=hyperparams["learning_rate"],
+        dropout=hyperparams["dropout"],
+        batch_size=int(hyperparams["batch_size"]),  # Ensure this is an integer
+        gcn_depth=int(hyperparams["gcn_depth"]),  # Ensure this is an integer
+        layers=int(hyperparams["layers"]),  # Ensure this is an integer
+        weight_decay=hyperparams["weight_decay"],
+        subgraph_size=int(hyperparams["subgraph_size"]),  # Ensure this is an integer
+        node_dim=int(hyperparams["node_dim"]),  # Ensure this is an integer
+        conv_channels=int(hyperparams["conv_channels"]),  # Ensure this is an integer
+        residual_channels=int(
+            hyperparams["residual_channels"]
+        ),  # Ensure this is an integer
+        skip_channels=int(hyperparams["skip_channels"]),  # Ensure this is an integer
+        end_channels=int(hyperparams["end_channels"]),  # Ensure this is an integer
+    )
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -437,31 +437,31 @@ def objective(hyperparams):
     return {"loss": objective_value, "status": STATUS_OK, "hyperparams": hyperparams}
 
 
-# trials = Trials()
+trials = Trials()
 
-# best = fmin(
-#     fn=objective,  # Objective function
-#     space=space,  # Hyperparameter space
-#     algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
-#     max_evals=50,  # Maximum number of evaluations
-#     trials=trials,  # Trials object to store the results of each evaluation
-# )
+best = fmin(
+    fn=objective,  # Objective function
+    space=space,  # Hyperparameter space
+    algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
+    max_evals=50,  # Maximum number of evaluations
+    trials=trials,  # Trials object to store the results of each evaluation
+)
 
-# print("Best hyperparameters found:")
-# print(best)
+print("Best hyperparameters found:")
+print(best)
 
-# # Find the trial with the lowest objective value
-# best_trial = sorted(trials, key=lambda x: x["result"]["loss"])[0]
+# Find the trial with the lowest objective value
+best_trial = sorted(trials, key=lambda x: x["result"]["loss"])[0]
 
-# print("Best hyperparameters:")
-# print(best_trial["result"]["hyperparams"])
+print("Best hyperparameters:")
+print(best_trial["result"]["hyperparams"])
 
-# print("Best objective value:")
-# print(best_trial["result"]["loss"])
+print("Best objective value:")
+print(best_trial["result"]["loss"])
 
 
 if __name__ == "__main__":
-    # best_hyperparams = best_trial["result"]["hyperparams"]
+    best_hyperparams = best_trial["result"]["hyperparams"]
     vmae = []
     vmape = []
     vrmse = []
@@ -471,7 +471,7 @@ if __name__ == "__main__":
     rmspe4 = []
     r_squared = []
     for i in range(args.runs):
-        vm1, vm2, vm3, m1, m2, m3, m4, m5, _ = main(i)
+        vm1, vm2, vm3, m1, m2, m3, m4, m5, _ = main(i, best_hyperparams)
         vmae.append(vm1)
         vmape.append(vm2)
         vrmse.append(vm3)
