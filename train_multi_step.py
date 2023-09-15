@@ -7,6 +7,7 @@ from trainer import Trainer
 from net import gtnet
 import pandas as pd
 from sklearn.metrics import r2_score
+from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 
 
 def rmspe(y_true, y_pred):
@@ -102,7 +103,7 @@ parser.add_argument("--step_size2", type=int, default=100, help="step_size")
 
 parser.add_argument("--epochs", type=int, default=300, help="")
 parser.add_argument("--print_every", type=int, default=50, help="")
-parser.add_argument("--seed", type=int, default=101, help="random seed")
+parser.add_argument("--seed", type=int, default=42, help="random seed")
 parser.add_argument("--save", type=str, default="./save/", help="save path")
 parser.add_argument("--expid", type=int, default=1, help="experiment id")
 
@@ -120,7 +121,65 @@ args = parser.parse_args()
 torch.set_num_threads(3)
 
 
+# space = {
+#     "learning_rate": hp.loguniform(
+#         "learning_rate", -5, 0
+#     ),  # Log-uniform distribution between e^-5 and 1
+#     "dropout": hp.uniform(
+#         "dropout", 0.1, 0.5
+#     ),  # Uniform distribution between 0.1 and 0.5
+#     "batch_size": hp.choice(
+#         "batch_size", [16, 32, 64]
+#     ),  # Choice among the specified values
+#     "gcn_depth": hp.choice(
+#         "gcn_depth", [1, 2, 3, 4, 5]
+#     ),  # Choice among the specified values
+#     "layers": hp.quniform(
+#         "layers", 1, 10, 1
+#     ),  # Uniform distribution of integer values between 1 and 10
+#     "weight_decay": hp.loguniform(
+#         "weight_decay", -10, -4
+#     ),  # Log-uniform distribution between e^-10 and e^-4
+#     "subgraph_size": hp.quniform(
+#         "subgraph_size", 10, 30, 1
+#     ),  # Uniform distribution of integer values between 10 and 30
+#     "node_dim": hp.quniform(
+#         "node_dim", 20, 60, 1
+#     ),  # Uniform distribution of integer values between 20 and 60
+#     "conv_channels": hp.quniform(
+#         "conv_channels", 16, 64, 1
+#     ),  # Uniform distribution of integer values between 16 and 64
+#     "residual_channels": hp.quniform(
+#         "residual_channels", 16, 64, 1
+#     ),  # Uniform distribution of integer values between 16 and 64
+#     "skip_channels": hp.quniform(
+#         "skip_channels", 32, 128, 1
+#     ),  # Uniform distribution of integer values between 32 and 128
+#     "end_channels": hp.quniform(
+#         "end_channels", 64, 256, 1
+#     ),  # Uniform distribution of integer values between 64 and 256
+# }
+
+
 def main(runid):
+    # parser.set_defaults(
+    #     learning_rate=hyperparams["learning_rate"],
+    #     dropout=hyperparams["dropout"],
+    #     batch_size=int(hyperparams["batch_size"]),  # Ensure this is an integer
+    #     gcn_depth=int(hyperparams["gcn_depth"]),  # Ensure this is an integer
+    #     layers=int(hyperparams["layers"]),  # Ensure this is an integer
+    #     weight_decay=hyperparams["weight_decay"],
+    #     subgraph_size=int(hyperparams["subgraph_size"]),  # Ensure this is an integer
+    #     node_dim=int(hyperparams["node_dim"]),  # Ensure this is an integer
+    #     conv_channels=int(hyperparams["conv_channels"]),  # Ensure this is an integer
+    #     residual_channels=int(
+    #         hyperparams["residual_channels"]
+    #     ),  # Ensure this is an integer
+    #     skip_channels=int(hyperparams["skip_channels"]),  # Ensure this is an integer
+    #     end_channels=int(hyperparams["end_channels"]),  # Ensure this is an integer
+    # )
+    args = parser.parse_args()
+
     # torch.manual_seed(args.seed)
     # torch.backends.cudnn.deterministic = True
     # torch.backends.cudnn.benchmark = False
@@ -202,7 +261,7 @@ def main(runid):
         train_mape = []
         train_rmse = []
         t1 = time.time()
-        dataloader["train_loader"].shuffle()
+        # dataloader["train_loader"].shuffle()
         for iter, (x, y) in enumerate(dataloader["train_loader"].get_iterator()):
             trainx = torch.Tensor(x).to(device)
             trainx = trainx.transpose(1, 3)
@@ -353,10 +412,49 @@ def main(runid):
         rmspe_array = np.array(rmspe_list)
         r2_list.append(r2_value)  # Store R-squared values in a list
         r2_array = np.array(r2_list)
-    return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array
+    return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array, minl
+
+
+def objective(hyperparams):
+    try:
+        # Call your main function with the current set of hyperparameters
+        vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array, minl = main(
+            0, hyperparams
+        )
+        objective_value = minl
+    except Exception as e:
+        print(f"An error occurred during evaluation: {e}")
+        objective_value = float("inf")
+
+    # Return the objective value and some extra information
+    return {"loss": objective_value, "status": STATUS_OK, "hyperparams": hyperparams}
+
+
+# trials = Trials()
+
+# best = fmin(
+#     fn=objective,  # Objective function
+#     space=space,  # Hyperparameter space
+#     algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
+#     max_evals=50,  # Maximum number of evaluations
+#     trials=trials,  # Trials object to store the results of each evaluation
+# )
+
+# print("Best hyperparameters found:")
+# print(best)
+
+# # Find the trial with the lowest objective value
+# best_trial = sorted(trials, key=lambda x: x["result"]["loss"])[0]
+
+# print("Best hyperparameters:")
+# print(best_trial["result"]["hyperparams"])
+
+# print("Best objective value:")
+# print(best_trial["result"]["loss"])
 
 
 if __name__ == "__main__":
+    # best_hyperparams = best_trial["result"]["hyperparams"]
     vmae = []
     vmape = []
     vrmse = []
@@ -366,7 +464,7 @@ if __name__ == "__main__":
     rmspe4 = []
     r_squared = []
     for i in range(args.runs):
-        vm1, vm2, vm3, m1, m2, m3, m4, m5 = main(i)
+        vm1, vm2, vm3, m1, m2, m3, m4, m5, _ = main(i)
         vmae.append(vm1)
         vmape.append(vm2)
         vrmse.append(vm3)

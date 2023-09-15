@@ -1,0 +1,31 @@
+Namespace(adj_data='data/sensor_graph/adj_mx.pkl', batch_size=32, buildA_true=True, cl=True, clip=5, conv_channels=56, data='data/METR-LA', device='cuda
+:0', dilation_exponential=1, dropout=0.1744673287068504, end_channels=213, epochs=300, expid=1, gcn_depth=4, gcn_true=True, in_dim=1, layers=9, learning
+_rate=0.007457655616415955, load_static_feature=False, node_dim=39, num_nodes=31, num_split=1, print_every=50, propalpha=0.05, residual_channels=42, run
+s=1, save='./save/', seed=42, seq_in_len=7, seq_out_len=3, skip_channels=90, step_size1=2500, step_size2=100, subgraph_size=23, tanhalpha=3, weight_deca
+y=0.0002748826394620175)
+
+The recpetive field size is 55                                                                                                                          
+Number of model parameters is 2180769                                                                                                                   
+start training...                                                                                                                                       
+Iter: 000, Train Loss: 0.5506, Train MAPE: 4.6688, Train RMSE: 0.6565                                                                                   
+Epoch: 001, Inference Time: 0.2426 secs                                                                                                                 
+Epoch: 001, Train Loss: 1.8601, Train MAPE: 5.6878, Train RMSE: 1.4285, Valid Loss: 0.5325, Valid MAPE: 3.8377, Valid RMSE: 0.7122, Training Time: 3.712
+7/epoch                                                                                                                                                 
+Iter: 000, Train Loss: 0.4127, Train MAPE: 3.9670, Train RMSE: 0.6714                                                                                   
+Epoch: 002, Inference Time: 0.2437 secs                                                                                                                 
+Epoch: 002, Train Loss: 0.5239, Train MAPE: 3.6760, Train RMSE: 0.7121, Valid Loss: 0.5699, Valid MAPE: 3.5148, Valid RMSE: 0.7711, Training Time: 3.707
+5/epoch                                                                                                                                                 
+Iter: 000, Train Loss: 0.5172, Train MAPE: 3.6189, Train RMSE: 0.7164                                                                                   
+Epoch: 003, Inference Time: 0.2427 secs                                                                                                                 
+Epoch: 003, Train Loss: 0.4840, Train MAPE: 3.5475, Train RMSE: 0.7115, Valid Loss: 0.4452, Valid MAPE: 3.6379, Valid RMSE: 0.6078, Training Time: 3.705
+9/epoch                                                                                                                                                 
+Iter: 000, Train Loss: 0.2238, Train MAPE: 3.7671, Train RMSE: 0.5747                                                                                   
+Epoch: 004, Inference Time: 0.2429 secs                                                                                                                 
+Epoch: 004, Train Loss: 0.2562, Train MAPE: 3.2951, Train RMSE: 0.6157, Valid Loss: 0.4114, Valid MAPE: 3.5481, Valid RMSE: 0.5896, Training Time: 3.709
+6/epoch                                                                                                                                                 
+Iter: 000, Train Loss: 0.1497, Train MAPE: 3.6798, Train RMSE: 0.5598                                                                                   
+Epoch: 005, Inference Time: 0.2427 secs                                                                                                                 
+Epoch: 005, Train Loss: 0.1763, Train MAPE: 3.1932, Train RMSE: 0.5955, Valid Loss: 0.4081, Valid MAPE: 3.5266, Valid RMSE: 0.5876, Training Time: 3.709
+3/epoch                                                                                                                                                 
+Iter: 000, Train Loss: 0.1283, Train MAPE: 3.6532, Train RMSE: 0.5579                                                                                   
+Epoch: 006, Inference Time: 0.2428 secs                                                    
