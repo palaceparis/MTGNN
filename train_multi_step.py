@@ -6,6 +6,7 @@ from util import *
 from trainer import Trainer
 from net import gtnet
 import pandas as pd
+from sklearn.metrics import r2_score
 
 
 def rmspe(y_true, y_pred):
@@ -99,7 +100,7 @@ parser.add_argument("--step_size1", type=int, default=2500, help="step_size")
 parser.add_argument("--step_size2", type=int, default=100, help="step_size")
 
 
-parser.add_argument("--epochs", type=int, default=100, help="")
+parser.add_argument("--epochs", type=int, default=300, help="")
 parser.add_argument("--print_every", type=int, default=50, help="")
 parser.add_argument("--seed", type=int, default=101, help="random seed")
 parser.add_argument("--save", type=str, default="./save/", help="save path")
@@ -112,7 +113,7 @@ parser.add_argument(
     "--num_split", type=int, default=1, help="number of splits for graphs"
 )
 
-parser.add_argument("--runs", type=int, default=10, help="number of runs")
+parser.add_argument("--runs", type=int, default=5, help="number of runs")
 
 
 args = parser.parse_args()
@@ -330,21 +331,29 @@ def main(runid):
     mape = []
     rmse = []
     rmspe_list = []
+    r2_list = []
     for i in range(args.seq_out_len):
         pred = scaler.inverse_transform(yhat[:, :, i])
         real = realy[:, :, i]
         metrics = metric(pred, real)
         rmspe_value = rmspe(real, pred)  # Calculate RMSPE
+        r2_value = r2_score(
+            real.cpu().numpy(), pred.cpu().numpy()
+        )  # Calculate R-squared
 
-        log = "Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}, Test RMSPE: {:.4f}"
-        print(log.format(i + 1, metrics[0], metrics[1], metrics[2], rmspe_value))
+        log = "Evaluate best model on test data for horizon {:d}, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}, Test RMSPE: {:.4f}, Test R2: {:.4f}"
+        print(
+            log.format(i + 1, metrics[0], metrics[1], metrics[2], rmspe_value, r2_value)
+        )
 
         mae.append(metrics[0])
         mape.append(metrics[1])
         rmse.append(metrics[2])
         rmspe_list.append(rmspe_value)  # Store RMSPE values in a list
         rmspe_array = np.array(rmspe_list)
-    return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array
+        r2_list.append(r2_value)  # Store R-squared values in a list
+        r2_array = np.array(rmspe_list)
+    return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array
 
 
 if __name__ == "__main__":
@@ -355,8 +364,9 @@ if __name__ == "__main__":
     mape = []
     rmse = []
     rmspe4 = []
+    r_squared = []
     for i in range(args.runs):
-        vm1, vm2, vm3, m1, m2, m3, m4 = main(i)
+        vm1, vm2, vm3, m1, m2, m3, m4, m5 = main(i)
         vmae.append(vm1)
         vmape.append(vm2)
         vrmse.append(vm3)
@@ -364,19 +374,25 @@ if __name__ == "__main__":
         mape.append(m2)
         rmse.append(m3)
         rmspe4.append(m4)
+        r_squared.append(m5)
 
     mae = np.array(mae)
     mape = np.array(mape)
     rmse = np.array(rmse)
+    rmspe4 = np.array(rmspe4)
+    r_squared = np.array(r_squared)
 
     amae = np.mean(mae, 0)
     amape = np.mean(mape, 0)
     armse = np.mean(rmse, 0)
     armspe = np.mean(rmspe4, 0)
+    arsquared = np.mean(r_squared, 0)
 
     smae = np.std(mae, 0)
     smape = np.std(mape, 0)
     srmse = np.std(rmse, 0)
+    srmspe = np.std(rmspe4, 0)
+    sr_squared = np.std(r_squared, 0)
 
     print("\n\nResults for 10 runs\n\n")
     # valid data
@@ -388,20 +404,23 @@ if __name__ == "__main__":
     print("\n\n")
     # test data
     print(
-        "test|horizon\tMAE-mean\tRMSE-mean\tRMSPE-mean\tMAPE-mean\tMAE-std\tRMSE-std\tMAPE-std"
+        "test|horizon\tMAE-mean\tMAPE-mean\tRMSE-mean\tRMSPE-mean\tR2-mean\tMAE-std\tMAPE-std\tRMSE-std\tRMSPE-std\tR2-std"
     )
     # 2 for 3 days ahead, 0 for 1 day ahead
     for i in [0]:
-        log = "{:d}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}"
+        log = "{:d}\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}"
         print(
             log.format(
                 i + 1,
                 amae[i],
+                amape[i] * 100,  # Convert to percentage
                 armse[i],
-                amape[i],
+                armspe[i] * 100,  # Convert to percentage
+                arsquared[i],
                 smae[i],
+                smape[i],  # Standard deviation without percentage
                 srmse[i],
-                smape[i],
-                armspe[i],
+                srmspe[i],  # Standard deviation without percentage
+                sr_squared[i],
             )
         )
