@@ -67,4 +67,9 @@ Epoch: 005, Inference Time: 0.2427 secs
 Epoch: 005, Train Loss: 0.1763, Train MAPE: 3.1932, Train RMSE: 0.5955, Valid Loss: 0.4081, Valid MAPE: 3.5266, Valid RMSE: 0.5876, Training Time: 3.709
 3/epoch                                                                                                                                                 
 Iter: 000, Train Loss: 0.1283, Train MAPE: 3.6532, Train RMSE: 0.5579                                                                                   
-Epoch: 006, Inference Time: 0.2428 secs                                                    
+Epoch: 006, Inference Time: 0.2428 secs       
+
+
+
+test|horizon    MAE-mean        MAPE-mean       RMSE-mean       RMSPE-mean      R2-mean
+Overall 0.023   4.057%  0.038   7.746%  0.643
