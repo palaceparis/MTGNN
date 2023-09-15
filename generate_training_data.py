@@ -69,7 +69,7 @@ def generate_train_val_test(args):
     x_offsets = np.sort(np.arange(-6, 1, 1))
 
     # Look ahead for 1 day, so we take a single value, 1
-    y_offsets = np.sort(np.arange(1, 2, 1))
+    y_offsets = np.sort(np.arange(1, 4, 1))
 
     # x: (num_samples, input_length, num_nodes, input_dim)
     # y: (num_samples, output_length, num_nodes, output_dim)
