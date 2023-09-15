@@ -395,6 +395,7 @@ if __name__ == "__main__":
     sr_squared = np.std(r_squared, 0)
 
     print("\n\nResults for 10 runs\n\n")
+
     # valid data
     print("valid\tMAE\tRMSE\tMAPE")
     log = "mean:\t{:.4f}\t{:.4f}\t{:.4f}"
@@ -402,25 +403,45 @@ if __name__ == "__main__":
     log = "std:\t{:.4f}\t{:.4f}\t{:.4f}"
     print(log.format(np.std(vmae), np.std(vrmse), np.std(vmape)))
     print("\n\n")
+
     # test data
     print(
         "test|horizon\tMAE-mean\tMAPE-mean\tRMSE-mean\tRMSPE-mean\tR2-mean\tMAE-std\tMAPE-std\tRMSE-std\tRMSPE-std\tR2-std"
     )
-    # 2 for 3 days ahead, 0 for 1 day ahead
-    for i in [0]:
-        log = "{:d}\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}"
-        print(
-            log.format(
-                i + 1,
-                amae[i],
-                amape[i] * 100,  # Convert to percentage
-                armse[i],
-                armspe[i] * 100,  # Convert to percentage
-                arsquared[i],
-                smae[i],
-                smape[i],  # Standard deviation without percentage
-                srmse[i],
-                srmspe[i],  # Standard deviation without percentage
-                sr_squared[i],
-            )
+    # Determine the number of horizons from the shape of one of your metric arrays
+    # num_horizons = amae.shape[0]
+
+    # Calculate the overall average and standard deviation for each metric
+    overall_amae = np.mean(amae)
+    overall_amape = np.mean(amape) * 100  # Convert to percentage
+    overall_armse = np.mean(armse)
+    overall_armspe = np.mean(armspe) * 100  # Convert to percentage
+    overall_arsquared = np.mean(arsquared)
+
+    overall_smae = np.std(amae)
+    overall_smape = np.std(amape)  # Standard deviation without percentage
+    overall_srmse = np.std(rmse)
+    overall_srmspe = np.std(armspe)  # Standard deviation without percentage
+    overall_sr_squared = np.std(r_squared)
+
+    # Print the overall averages and standard deviations
+    log = "Overall\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}%\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}"
+    print(
+        log.format(
+            overall_amae,
+            overall_amape,
+            overall_armse,
+            overall_armspe,
+            overall_arsquared,
+            overall_smae,
+            overall_smape,
+            overall_srmse,
+            overall_srmspe,
+            overall_sr_squared,
         )
+    )
+
+
+# Three places to change when changing horizons
+# - output sequence
+# - generate_training_data
