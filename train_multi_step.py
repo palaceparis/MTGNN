@@ -120,64 +120,33 @@ parser.add_argument("--runs", type=int, default=1, help="number of runs")
 args = parser.parse_args()
 torch.set_num_threads(3)
 
-
-space = {
-    "learning_rate": hp.loguniform(
-        "learning_rate", -5, 0
-    ),  # Log-uniform distribution between e^-5 and 1
-    "dropout": hp.uniform(
-        "dropout", 0.1, 0.5
-    ),  # Uniform distribution between 0.1 and 0.5
-    "batch_size": hp.choice(
-        "batch_size", [16, 32, 64]
-    ),  # Choice among the specified values
-    "gcn_depth": hp.choice(
-        "gcn_depth", [1, 2, 3, 4, 5]
-    ),  # Choice among the specified values
-    "layers": hp.quniform(
-        "layers", 1, 10, 1
-    ),  # Uniform distribution of integer values between 1 and 10
-    "weight_decay": hp.loguniform(
-        "weight_decay", -10, -4
-    ),  # Log-uniform distribution between e^-10 and e^-4
-    "subgraph_size": hp.quniform(
-        "subgraph_size", 10, 30, 1
-    ),  # Uniform distribution of integer values between 10 and 30
-    "node_dim": hp.quniform(
-        "node_dim", 20, 60, 1
-    ),  # Uniform distribution of integer values between 20 and 60
-    "conv_channels": hp.choice(
-        "conv_channels", [2, 4, 8, 16, 32, 64, 128]
-    ),  # Powers of 2 between 2 and 128
-    "residual_channels": hp.choice(
-        "residual_channels", [2, 4, 8, 16, 32, 64]
-    ),  # Powers of 2 between 16 and 64
-    "skip_channels": hp.choice(
-        "skip_channels", [2, 4, 8, 16, 32, 64, 128]
-    ),  # Powers of 2 between 32 and 128
-    "end_channels": hp.choice(
-        "end_channels", [2, 4, 8, 16, 32, 64, 128, 256]
-    ),  # Powers of 2 between 64 and 256
-}
+hyperopt = False
 
 
-def main(runid, hyperparams):
-    parser.set_defaults(
-        learning_rate=hyperparams["learning_rate"],
-        dropout=hyperparams["dropout"],
-        batch_size=int(hyperparams["batch_size"]),  # Ensure this is an integer
-        gcn_depth=int(hyperparams["gcn_depth"]),  # Ensure this is an integer
-        layers=int(hyperparams["layers"]),  # Ensure this is an integer
-        weight_decay=hyperparams["weight_decay"],
-        subgraph_size=int(hyperparams["subgraph_size"]),  # Ensure this is an integer
-        node_dim=int(hyperparams["node_dim"]),  # Ensure this is an integer
-        conv_channels=int(hyperparams["conv_channels"]),  # Ensure this is an integer
-        residual_channels=int(
-            hyperparams["residual_channels"]
-        ),  # Ensure this is an integer
-        skip_channels=int(hyperparams["skip_channels"]),  # Ensure this is an integer
-        end_channels=int(hyperparams["end_channels"]),  # Ensure this is an integer
-    )
+def main(runid, hyperparams=None):
+    if hyperopt:
+        parser.set_defaults(
+            learning_rate=hyperparams["learning_rate"],
+            dropout=hyperparams["dropout"],
+            batch_size=int(hyperparams["batch_size"]),  # Ensure this is an integer
+            gcn_depth=int(hyperparams["gcn_depth"]),  # Ensure this is an integer
+            layers=int(hyperparams["layers"]),  # Ensure this is an integer
+            weight_decay=hyperparams["weight_decay"],
+            subgraph_size=int(
+                hyperparams["subgraph_size"]
+            ),  # Ensure this is an integer
+            node_dim=int(hyperparams["node_dim"]),  # Ensure this is an integer
+            conv_channels=int(
+                hyperparams["conv_channels"]
+            ),  # Ensure this is an integer
+            residual_channels=int(
+                hyperparams["residual_channels"]
+            ),  # Ensure this is an integer
+            skip_channels=int(
+                hyperparams["skip_channels"]
+            ),  # Ensure this is an integer
+            end_channels=int(hyperparams["end_channels"]),  # Ensure this is an integer
+        )
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
@@ -415,46 +384,92 @@ def main(runid, hyperparams):
     return vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array, minl
 
 
-def objective(hyperparams):
-    try:
-        # Call your main function with the current set of hyperparameters
-        vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array, minl = main(
-            0, hyperparams
-        )
-        objective_value = minl
-    except Exception as e:
-        print(f"An error occurred during evaluation: {e}")
-        objective_value = float("inf")
+if hyperopt:
+    space = {
+        "learning_rate": hp.loguniform(
+            "learning_rate", -5, 0
+        ),  # Log-uniform distribution between e^-5 and 1
+        "dropout": hp.uniform(
+            "dropout", 0.1, 0.5
+        ),  # Uniform distribution between 0.1 and 0.5
+        "batch_size": hp.choice(
+            "batch_size", [16, 32, 64]
+        ),  # Choice among the specified values
+        "gcn_depth": hp.choice(
+            "gcn_depth", [1, 2, 3, 4, 5]
+        ),  # Choice among the specified values
+        "layers": hp.quniform(
+            "layers", 1, 10, 1
+        ),  # Uniform distribution of integer values between 1 and 10
+        "weight_decay": hp.loguniform(
+            "weight_decay", -10, -4
+        ),  # Log-uniform distribution between e^-10 and e^-4
+        "subgraph_size": hp.quniform(
+            "subgraph_size", 10, 30, 1
+        ),  # Uniform distribution of integer values between 10 and 30
+        "node_dim": hp.quniform(
+            "node_dim", 20, 60, 1
+        ),  # Uniform distribution of integer values between 20 and 60
+        "conv_channels": hp.choice(
+            "conv_channels", [2, 4, 8, 16, 32, 64, 128]
+        ),  # Powers of 2 between 2 and 128
+        "residual_channels": hp.choice(
+            "residual_channels", [2, 4, 8, 16, 32, 64]
+        ),  # Powers of 2 between 16 and 64
+        "skip_channels": hp.choice(
+            "skip_channels", [2, 4, 8, 16, 32, 64, 128]
+        ),  # Powers of 2 between 32 and 128
+        "end_channels": hp.choice(
+            "end_channels", [2, 4, 8, 16, 32, 64, 128, 256]
+        ),  # Powers of 2 between 64 and 256
+    }
 
-    # Return the objective value and some extra information
-    return {"loss": objective_value, "status": STATUS_OK, "hyperparams": hyperparams}
+    def objective(hyperparams):
+        try:
+            # Call your main function with the current set of hyperparameters
+            vmae, vmape, vrmse, mae, mape, rmse, rmspe_array, r2_array, minl = main(
+                0, hyperparams
+            )
+            objective_value = minl
+        except Exception as e:
+            print(f"An error occurred during evaluation: {e}")
+            objective_value = float("inf")
 
+        # Return the objective value and some extra information
+        return {
+            "loss": objective_value,
+            "status": STATUS_OK,
+            "hyperparams": hyperparams,
+        }
 
-trials = Trials()
+    trials = Trials()
 
-best = fmin(
-    fn=objective,  # Objective function
-    space=space,  # Hyperparameter space
-    algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
-    max_evals=50,  # Maximum number of evaluations
-    trials=trials,  # Trials object to store the results of each evaluation
-)
+    best = fmin(
+        fn=objective,  # Objective function
+        space=space,  # Hyperparameter space
+        algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
+        max_evals=50,  # Maximum number of evaluations
+        trials=trials,  # Trials object to store the results of each evaluation
+    )
 
-print("Best hyperparameters found:")
-print(best)
+    print("Best hyperparameters found:")
+    print(best)
 
-# Find the trial with the lowest objective value
-best_trial = sorted(trials, key=lambda x: x["result"]["loss"])[0]
+    # Find the trial with the lowest objective value
+    best_trial = sorted(trials, key=lambda x: x["result"]["loss"])[0]
 
-print("Best hyperparameters:")
-print(best_trial["result"]["hyperparams"])
+    print("Best hyperparameters:")
+    print(best_trial["result"]["hyperparams"])
 
-print("Best objective value:")
-print(best_trial["result"]["loss"])
+    print("Best objective value:")
+    print(best_trial["result"]["loss"])
 
 
 if __name__ == "__main__":
-    best_hyperparams = best_trial["result"]["hyperparams"]
+    if hyperopt:
+        best_hyperparams = best_trial["result"]["hyperparams"]
+    else:
+        best_hyperparams = None
     vmae = []
     vmape = []
     vrmse = []
