@@ -73,3 +73,40 @@ Epoch: 006, Inference Time: 0.2428 secs
 
 test|horizon    MAE-mean        MAPE-mean       RMSE-mean       RMSPE-mean      R2-mean
 Overall 0.023   4.057%  0.038   7.746%  0.643
+
+
+
+
+horizon 1
+
+{'batch_size': 16, 'conv_channels': 20.0, 'dropout': 0.4007035228288079, 'end_channels': 100.0, 'gcn_depth': 5, 'layers': 7.0, 'learning_rate': 0.007803456141764061, 'node_dim': 20.0, 'residual
+_channels': 18.0, 'skip_channels': 45.0, 'subgraph_size': 20.0, 'weight_decay': 0.0005898029176315602}                                                       
+Best objective value:                                                                                                                                                                            
+0.018252135533839465                                                                                                                                         
+Namespace(adj_data='data/sensor_graph/adj_mx.pkl', batch_size=16, buildA_true=True, cl=True, clip=5, conv_channels=20, data='data/METR-LA', device='cuda:0', dilation_exponential=1, dropout=0.40
+07035228288079, end_channels=100, epochs=300, expid=1, gcn_depth=5, gcn_true=True, in_dim=1, layers=7, learning_rate=0.007803456141764061, load_static_feature=False, node_dim=20, num_nodes=31, 
+num_split=1, print_every=50, propalpha=0.05, residual_channels=18, runs=1, save='./save/', seed=42, seq_in_len=7, seq_out_len=1, skip_channels=45, step_size1=2500, step_size2=100, subgraph_size
+=20, tanhalpha=3, weight_decay=0.0005898029176315602)                                                                                                        
+The recpetive field size is 43                                                                                                                               
+Number of model parameters is 334193 
+
+
+
+Average Training Time: 1.7484 secs/epoch                                                                                                                     
+Average Inference Time: 0.0932 secs                                                                                                                          
+Training finished                                                                                                                                            
+The valid loss on best model is 0.0183                                                                                                                       
+Evaluate best model on test data for horizon 1, Test MAE: 0.0166, Test MAPE: 0.0579, Test RMSE: 0.0275, Test RMSPE: 0.2481, Test R2: -1.4330                 
+                                                                                                                                                             
+                                                                                                                                                             
+Results for 10 runs                                                                                                                                          
+                                                                                                                                                             
+                                                                                                                                                             
+valid   MAE     RMSE    MAPE                                                                                                                                 
+mean:   0.0193  0.0330  0.0846                                                                                                                               
+std:    0.0000  0.0000  0.0000                                                                                                                               
+                                                                                                                                                             
+                                                                                                                                                             
+                                                                                                                                                             
+test|horizon    MAE-mean        MAPE-mean       RMSE-mean       RMSPE-mean      R2-mean                                                                      
+Overall 0.017   5.794%  0.027   24.809% -1.433
