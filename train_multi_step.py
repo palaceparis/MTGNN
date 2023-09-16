@@ -9,7 +9,12 @@ import pandas as pd
 from sklearn.metrics import r2_score
 import yaml
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
+import subprocess
 
+y_offset_end_value = 4  # 2 for horizon = 1, 4 for horizon = 3
+subprocess.call(
+    ["python", "generate_training_data.py", "--y_offset_end", str(y_offset_end_value)]
+)
 hyperopt = False
 
 

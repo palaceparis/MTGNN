@@ -55,7 +55,7 @@ def generate_graph_seq2seq_io_data(
     return x, y
 
 
-def generate_train_val_test(args):
+def generate_train_val_test(args, y_offset_end=2):
     emissions = pd.read_csv("data/us_emi.csv")
     # Rename the first column
     emissions = emissions.rename(columns={"Unnamed: 0": "Date"})
@@ -69,7 +69,7 @@ def generate_train_val_test(args):
     x_offsets = np.sort(np.arange(-6, 1, 1))
 
     # Look ahead for 1 day, so we take a single value, 1
-    y_offsets = np.sort(np.arange(1, 2, 1))
+    y_offsets = np.sort(np.arange(1, y_offset_end, 1))
 
     # x: (num_samples, input_length, num_nodes, input_dim)
     # y: (num_samples, output_length, num_nodes, output_dim)
@@ -114,7 +114,7 @@ def generate_train_val_test(args):
 
 def main(args):
     print("Generating training data")
-    generate_train_val_test(args)
+    generate_train_val_test(args, y_offset_end=args.y_offset_end)
 
 
 if __name__ == "__main__":
@@ -128,5 +128,12 @@ if __name__ == "__main__":
         default="data/metr-la.h5",
         help="Raw traffic readings.",
     )
+    parser.add_argument(
+        "--y_offset_end",
+        type=int,
+        default=2,
+        help="2 for horizon = 1, 4 for horizon = 3",
+    )
+
     args = parser.parse_args()
     main(args)
