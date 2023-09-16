@@ -9,6 +9,8 @@ import pandas as pd
 from sklearn.metrics import r2_score
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 
+hyperopt = False
+
 
 def rmspe(y_true, y_pred):
     """
@@ -119,8 +121,6 @@ parser.add_argument("--runs", type=int, default=1, help="number of runs")
 
 args = parser.parse_args()
 torch.set_num_threads(3)
-
-hyperopt = False
 
 
 def main(runid, hyperparams=None):
