@@ -121,6 +121,10 @@ args = parser.parse_args()
 torch.set_num_threads(3)
 
 
+def get_nearest_power_of_two(x):
+    return int(round(np.log2(x)))
+
+
 space = {
     "learning_rate": hp.loguniform(
         "learning_rate", -5, 0
@@ -146,9 +150,7 @@ space = {
     "node_dim": hp.quniform(
         "node_dim", 20, 60, 1
     ),  # Uniform distribution of integer values between 20 and 60
-    "conv_channels": hp.quniform(
-        "conv_channels", 16, 64, 1
-    ),  # Uniform distribution of integer values between 16 and 64
+    "conv_channels": hp.qloguniform("conv_channels", np.log2(2), np.log2(128), 1),
     "residual_channels": hp.quniform(
         "residual_channels", 16, 64, 1
     ),  # Uniform distribution of integer values between 16 and 64
@@ -171,7 +173,9 @@ def main(runid, hyperparams):
         weight_decay=hyperparams["weight_decay"],
         subgraph_size=int(hyperparams["subgraph_size"]),  # Ensure this is an integer
         node_dim=int(hyperparams["node_dim"]),  # Ensure this is an integer
-        conv_channels=int(hyperparams["conv_channels"]),  # Ensure this is an integer
+        conv_channels=get_nearest_power_of_two(
+            hyperparams["conv_channels"]
+        ),  # Ensure this is an integer
         residual_channels=int(
             hyperparams["residual_channels"]
         ),  # Ensure this is an integer
