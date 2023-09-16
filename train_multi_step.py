@@ -65,43 +65,36 @@ parser.add_argument(
     "--cl", type=str_to_bool, default=True, help="whether to do curriculum learning"
 )
 
-parser.add_argument("--gcn_depth", type=int, default=4, help="graph convolution depth")
+parser.add_argument("--gcn_depth", type=int, default=2, help="graph convolution depth")
 parser.add_argument(
     "--num_nodes", type=int, default=31, help="number of nodes/variables"
 )
-parser.add_argument(
-    "--dropout", type=float, default=0.1744673287068504, help="dropout rate"
-)
-parser.add_argument("--subgraph_size", type=int, default=23, help="k")
-parser.add_argument("--node_dim", type=int, default=39, help="dim of nodes")
+parser.add_argument("--dropout", type=float, default=0.3, help="dropout rate")
+parser.add_argument("--subgraph_size", type=int, default=20, help="k")
+parser.add_argument("--node_dim", type=int, default=40, help="dim of nodes")
 parser.add_argument(
     "--dilation_exponential", type=int, default=1, help="dilation exponential"
 )
 
 parser.add_argument(
-    "--conv_channels", type=int, default=56, help="convolution channels"
+    "--conv_channels", type=int, default=32, help="convolution channels"
 )
 parser.add_argument(
-    "--residual_channels", type=int, default=42, help="residual channels"
+    "--residual_channels", type=int, default=32, help="residual channels"
 )
-parser.add_argument("--skip_channels", type=int, default=90, help="skip channels")
-parser.add_argument("--end_channels", type=int, default=213, help="end channels")
+parser.add_argument("--skip_channels", type=int, default=64, help="skip channels")
+parser.add_argument("--end_channels", type=int, default=128, help="end channels")
 
 
 parser.add_argument("--in_dim", type=int, default=1, help="inputs dimension")
 parser.add_argument("--seq_in_len", type=int, default=7, help="input sequence length")
 parser.add_argument("--seq_out_len", type=int, default=1, help="output sequence length")
 
-parser.add_argument("--layers", type=int, default=9, help="number of layers")
-parser.add_argument("--batch_size", type=int, default=32, help="batch size")
+parser.add_argument("--layers", type=int, default=3, help="number of layers")
+parser.add_argument("--batch_size", type=int, default=64, help="batch size")
+parser.add_argument("--learning_rate", type=float, default=0.001, help="learning rate")
 parser.add_argument(
-    "--learning_rate", type=float, default=0.007457655616415955, help="learning rate"
-)
-parser.add_argument(
-    "--weight_decay",
-    type=float,
-    default=0.0002748826394620175,
-    help="weight decay rate",
+    "--weight_decay", type=float, default=0.0001, help="weight decay rate"
 )
 parser.add_argument("--clip", type=int, default=5, help="clip")
 parser.add_argument("--step_size1", type=int, default=2500, help="step_size")
