@@ -493,7 +493,7 @@ if hyperopt:
         fn=objective,  # Objective function
         space=space,  # Hyperparameter space
         algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
-        max_evals=70,  # Maximum number of evaluations
+        max_evals=80,  # Maximum number of evaluations
         trials=trials,  # Trials object to store the results of each evaluation
     )
 
