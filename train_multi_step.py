@@ -7,6 +7,7 @@ from trainer import Trainer
 from net import gtnet
 import pandas as pd
 from sklearn.metrics import r2_score
+import yaml
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 
 hyperopt = False
@@ -103,7 +104,7 @@ parser.add_argument("--step_size1", type=int, default=2500, help="step_size")
 parser.add_argument("--step_size2", type=int, default=100, help="step_size")
 
 
-parser.add_argument("--epochs", type=int, default=300, help="")
+parser.add_argument("--epochs", type=int, default=3, help="")
 parser.add_argument("--print_every", type=int, default=50, help="")
 parser.add_argument("--seed", type=int, default=42, help="random seed")
 parser.add_argument("--save", type=str, default="./save/", help="save path")
@@ -552,7 +553,21 @@ if __name__ == "__main__":
         )
     )
 
+    results = {
+        "test|horizon": {
+            "MAE-mean": f"{float(overall_amae):.3f}",
+            "MAPE-mean": f"{float(overall_amape):.3f}%",
+            "RMSE-mean": f"{float(overall_armse):.3f}",
+            "RMSPE-mean": f"{float(overall_armspe):.3f}%",
+            "R2-mean": f"{float(overall_arsquared):.3f}",
+        }
+    }
 
-# Three places to change when changing horizons
-# - output sequence
-# - generate_training_data
+    # Specify the file path
+    file_path = (
+        f"results_seed_{args.seed}_nodes_{args.num_nodes}_seq_{args.seq_out_len}.yaml"
+    )
+
+    # Save the dictionary to a YAML file
+    with open(file_path, "w") as file:
+        yaml.dump(results, file, default_flow_style=False)
