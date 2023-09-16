@@ -11,7 +11,7 @@ import yaml
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 import subprocess
 
-hyperopt = False
+hyperopt = True
 csv_filepath = "data/eu_emi.csv"  # Dataset
 y_offset_end_value = 2  # 2 for horizon = 1, 4 for horizon = 3
 
@@ -482,7 +482,7 @@ if hyperopt:
         fn=objective,  # Objective function
         space=space,  # Hyperparameter space
         algo=tpe.suggest,  # Optimization algorithm (Tree of Parzen Estimators)
-        max_evals=50,  # Maximum number of evaluations
+        max_evals=2,  # Maximum number of evaluations
         trials=trials,  # Trials object to store the results of each evaluation
     )
 
@@ -595,6 +595,10 @@ if __name__ == "__main__":
             "R2-mean": f"{float(overall_arsquared):.3f}",
         }
     }
+
+    if hyperopt:
+        results["best_hyperparameters"] = best_trial["result"]["hyperparams"]
+        results["best_objective_value"] = best_trial["result"]["loss"]
 
     # Specify the file path
     file_path = (
