@@ -56,7 +56,7 @@ def generate_graph_seq2seq_io_data(
 
 
 def generate_train_val_test(args):
-    emissions = pd.read_csv("data/emissions.csv")
+    emissions = pd.read_csv("data/us_emi.csv")
     # Rename the first column
     emissions = emissions.rename(columns={"Unnamed: 0": "Date"})
     # Convert the 'Date' column to datetime
