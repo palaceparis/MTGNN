@@ -11,11 +11,29 @@ import yaml
 from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
 import subprocess
 
-y_offset_end_value = 4  # 2 for horizon = 1, 4 for horizon = 3
-subprocess.call(
-    ["python", "generate_training_data.py", "--y_offset_end", str(y_offset_end_value)]
-)
 hyperopt = False
+csv_filepath = "data/eu_emi.csv"  # Dataset
+y_offset_end_value = 2  # 2 for horizon = 1, 4 for horizon = 3
+
+
+if csv_filepath == "data/us_emi.csv":
+    default_num_nodes = 51
+elif csv_filepath == "data/emissions.csv":
+    default_num_nodes = 31
+else:
+    default_num_nodes = 28
+
+
+subprocess.call(
+    [
+        "python",
+        "generate_training_data.py",
+        "--y_offset_end",
+        str(y_offset_end_value),
+        "--csv_filepath",
+        csv_filepath,
+    ]
+)
 
 
 def rmspe(y_true, y_pred):
@@ -75,7 +93,7 @@ parser.add_argument(
 
 parser.add_argument("--gcn_depth", type=int, default=2, help="graph convolution depth")
 parser.add_argument(
-    "--num_nodes", type=int, default=51, help="number of nodes/variables"
+    "--num_nodes", type=int, default=default_num_nodes, help="number of nodes/variables"
 )
 parser.add_argument("--dropout", type=float, default=0.3, help="dropout rate")
 parser.add_argument("--subgraph_size", type=int, default=20, help="k")
@@ -96,7 +114,12 @@ parser.add_argument("--end_channels", type=int, default=128, help="end channels"
 
 parser.add_argument("--in_dim", type=int, default=1, help="inputs dimension")
 parser.add_argument("--seq_in_len", type=int, default=7, help="input sequence length")
-parser.add_argument("--seq_out_len", type=int, default=1, help="output sequence length")
+parser.add_argument(
+    "--seq_out_len",
+    type=int,
+    default=(y_offset_end_value - 1),
+    help="output sequence length",
+)
 
 parser.add_argument("--layers", type=int, default=3, help="number of layers")
 parser.add_argument("--batch_size", type=int, default=64, help="batch size")
@@ -166,7 +189,12 @@ def main(runid, hyperparams=None):
     )
     scaler = dataloader["scaler"]
 
-    predefined_A = pd.read_csv("data/sensor_graph/us_dis.csv", header=None)
+    if csv_filepath == "data/us_emi.csv":
+        predefined_A = pd.read_csv("data/sensor_graph/us_dis.csv", header=None)
+    elif csv_filepath == "data/emissions.csv":
+        predefined_A = pd.read_csv("data/sensor_graph/distance.csv", header=None)
+    else:
+        predefined_A = pd.read_csv("data/sensor_graph/eu_dis.csv", header=None)
 
     # Assuming 'matrix' is your 2D NumPy array
     mean = np.mean(predefined_A)

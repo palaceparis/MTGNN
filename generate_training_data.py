@@ -56,7 +56,7 @@ def generate_graph_seq2seq_io_data(
 
 
 def generate_train_val_test(args, y_offset_end=2):
-    emissions = pd.read_csv("data/us_emi.csv")
+    emissions = pd.read_csv(args.csv_filepath)
     # Rename the first column
     emissions = emissions.rename(columns={"Unnamed: 0": "Date"})
     # Convert the 'Date' column to datetime
@@ -133,6 +133,12 @@ if __name__ == "__main__":
         type=int,
         default=2,
         help="2 for horizon = 1, 4 for horizon = 3",
+    )
+    parser.add_argument(
+        "--csv_filepath",
+        type=str,
+        default="data/us_emi.csv",
+        help="Path to the CSV file",
     )
 
     args = parser.parse_args()
