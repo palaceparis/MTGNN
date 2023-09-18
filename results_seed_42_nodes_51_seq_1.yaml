@@ -1,0 +1,20 @@
+best_hyperparameters:
+  batch_size: 64
+  conv_channels: 32
+  dropout: 0.36294709885796755
+  end_channels: 4
+  gcn_depth: 1
+  layers: 9.0
+  learning_rate: 0.006914389558359653
+  node_dim: 54.0
+  residual_channels: 16
+  skip_channels: 32
+  subgraph_size: 28.0
+  weight_decay: 9.468293828366128e-05
+best_objective_value: 0.003788662375882268
+test|horizon:
+  MAE-mean: '0.004'
+  MAPE-mean: 3.868%
+  R2-mean: '0.707'
+  RMSE-mean: '0.007'
+  RMSPE-mean: 9.934%
