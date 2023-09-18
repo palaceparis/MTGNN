@@ -128,7 +128,7 @@ args = parser.parse_args()
 torch.set_num_threads(3)
 
 
-hyperopt = True
+hyperopt = False
 csv_filepath = args.csv_filepath
 y_offset_end_value = args.y_offset_end_value
 
@@ -612,9 +612,7 @@ if __name__ == "__main__":
         results["best_objective_value"] = best_trial["result"]["loss"]
 
     # Specify the file path
-    file_path = (
-        f"results_seed_{args.seed}_nodes_{args.num_nodes}_seq_{args.seq_out_len}.yaml"
-    )
+    file_path = f"seeds_results_seed_{args.seed}_nodes_{args.num_nodes}_seq_{args.seq_out_len}.yaml"
 
     # Save the dictionary to a YAML file
     with open(file_path, "w") as file:
