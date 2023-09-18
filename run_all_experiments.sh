@@ -5,7 +5,7 @@ scripts=(
   "run_experiments_cn_1.sh"
   "run_experiments_cn_3.sh"
   "run_experiments_eu_3.sh"
-  "runexperiments.sh"
+  "run_experiments.sh"
   "run_experiments_us_1.sh"
   "run_experiments_us_3.sh"
 )
