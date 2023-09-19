@@ -1,0 +1,6 @@
+test|horizon:
+  MAE-mean: '0.005'
+  MAPE-mean: 2.261%
+  R2-mean: '0.909'
+  RMSE-mean: '0.013'
+  RMSPE-mean: 3.814%
